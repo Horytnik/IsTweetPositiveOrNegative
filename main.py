@@ -12,7 +12,6 @@ from sklearn.model_selection import train_test_split
 importedData = pd.read_csv("Data_tweets.csv", sep = ",",header = None)
 importedData.columns = ['index','polarity','id', 'date', 'query', 'user', 'text']
 
-
 print("Neutral messages: ",importedData.loc[importedData['polarity'] ==2])
 # As there are no neutral messages I will do binary classification between positive and negative messages 0 is
 # negative and 1 is positive
@@ -63,8 +62,8 @@ X_train_mat = pad_sequences(X_train_mat, maxlen=100)
 
 
 
-epochs = 7
-batch_size = 45
+epochs = 15
+batch_size = 32
 sequentialModel = functions.sequential_mixed_model(X_train_mat.shape[1])
 history = sequentialModel.fit(X_train_mat, Ytrain,
                     epochs=epochs,
@@ -99,6 +98,7 @@ plt.legend(['train', 'test'], loc='upper left')
 plt.ylim(0, 1)
 plt.show()
 print('end')
+
 
 
 print("end")
