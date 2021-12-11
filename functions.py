@@ -18,7 +18,7 @@ def word_frex_without_stop(inputText):
         sentence = sentence.lower()
         sentence = sentence.split(' ')
         for word in sentence:
-            if (word not in STOPWORDS) & (word not in dumblist) & (not word.startswith( 'http' )) & (not word.startswith( 'https' ))& (not word.startswith( '&amp' )& (not word.startswith( '@' ))):
+            if ((word not in STOPWORDS) & (word not in dumblist) & (not word.startswith( 'http' )) & (not word.startswith( 'https' )) & (not word.startswith( '@' ))):
                 if (word in freqDict):
                     freqDict[word] = freqDict[word]+1
                 else:
@@ -35,7 +35,7 @@ def remove_stop_words(inputText):
         sentence = sentence.lower()
         sentence = sentence.split(' ')
         for word in sentence:
-            if (word not in STOPWORDS) & (word not in dumblist) & (not word.startswith( 'http' )) & (not word.startswith( 'https' ))& (not word.startswith( '&amp' ) & (not word.startswith( '@' )) ):
+            if ((word not in STOPWORDS) & (word not in dumblist) & (not word.startswith( 'http' )) & (not word.startswith( 'https' )) & (not word.startswith( '@' ))):
                 list.append(word)
         list = " ".join(list)
         array = np.append(array,list)

@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 import functions
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import plot_confusion_matrix
 
 importedData = pd.read_csv("Data_tweets.csv", sep = ",",header = None)
 importedData.columns = ['index','polarity','id', 'date', 'query', 'user', 'text']
@@ -45,25 +47,41 @@ plt.yticks(y_pos, dictTarRemStop1.word.head(50) )
 plt.gca().invert_yaxis()
 plt.show()
 
-Xtrain, Xtest, Ytrain, Ytest = train_test_split(importedData['text'], importedData['polarity'], test_size= 0.33, shuffle=True, random_state= 42)
+clearedData = functions.remove_stop_words(importedData['text'])
+
+Xtrain, Xtest, Ytrain, Ytest = train_test_split(clearedData, importedData['polarity'], test_size= 0.33, shuffle=True, random_state= 42)
 
 
-XtrainRvStop = functions.remove_stop_words(Xtrain)
+#wordVector = TfidfVectorizer(max_features=20000, lowercase=True, analyzer='word', #You can also try 'char'
+#                            stop_words= 'english',ngram_range=(1,3),dtype=np.float32)
+wordVector = TfidfVectorizer(binary=True)
+XtrainVect = wordVector.fit_transform(Xtrain)
+XtestVect = wordVector.transform(Xtest)
+
+
+
+# Logistic Regression model
+logisticRegModel = LogisticRegression(random_state = 1)
+logisticRegModel.fit(XtrainVect, Ytrain)
+
+print(logisticRegModel.score(XtestVect, Ytest))
+
+plot_confusion_matrix(logisticRegModel, XtestVect, Ytest)
+plt.show()
+
 
 N = 180
-
 tokenizer = Tokenizer(num_words=N, filters='!"#$%&()*+,-./:;<=>?@[\]^_`{|}~', lower=True)
-tokenizer.fit_on_texts(XtrainRvStop)
+tokenizer.fit_on_texts(Xtrain)
 word_index_train = tokenizer.word_index
 
-X_train_mat = tokenizer.texts_to_sequences(XtrainRvStop)
+X_train_mat = tokenizer.texts_to_sequences(Xtrain)
 X_train_mat = pad_sequences(X_train_mat, maxlen=100)
 
 
 
-
-epochs = 15
-batch_size = 32
+epochs = 10
+batch_size = 64
 sequentialModel = functions.sequential_mixed_model(X_train_mat.shape[1])
 history = sequentialModel.fit(X_train_mat, Ytrain,
                     epochs=epochs,
@@ -98,6 +116,8 @@ plt.legend(['train', 'test'], loc='upper left')
 plt.ylim(0, 1)
 plt.show()
 print('end')
+
+
 
 
 
