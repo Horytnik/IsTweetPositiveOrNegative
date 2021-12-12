@@ -2,9 +2,7 @@ import pandas as pd
 import numpy as np
 
 from tensorflow.keras.models import Sequential
-
-from tensorflow.keras.layers import Dense, Embedding,Flatten, Dropout, LSTM, Conv1D, MaxPooling1D, GlobalMaxPooling1D
-
+from tensorflow.keras.layers import Dense, Embedding, Dropout, LSTM, Conv1D, MaxPooling1D, GlobalMaxPooling1D, Flatten
 
 from wordcloud import STOPWORDS
 
@@ -18,7 +16,7 @@ def word_frex_without_stop(inputText):
         sentence = sentence.lower()
         sentence = sentence.split(' ')
         for word in sentence:
-            if ((word not in STOPWORDS) & (word not in dumblist) & (not word.startswith( 'http' )) & (not word.startswith( 'https' )) & (not word.startswith( '@' ))):
+            if ((word not in STOPWORDS) & (word not in dumblist) & (not word.startswith( '@amp' )) & (not word.startswith( 'http' )) & (not word.startswith( 'https' )) & (not word.startswith( '@' ))):
                 if (word in freqDict):
                     freqDict[word] = freqDict[word]+1
                 else:
@@ -35,7 +33,7 @@ def remove_stop_words(inputText):
         sentence = sentence.lower()
         sentence = sentence.split(' ')
         for word in sentence:
-            if ((word not in STOPWORDS) & (word not in dumblist) & (not word.startswith( 'http' )) & (not word.startswith( 'https' )) & (not word.startswith( '@' ))):
+            if ((word not in STOPWORDS) & (word not in dumblist)  & (not word.startswith( '@amp' )) & (not word.startswith( 'http' )) & (not word.startswith( 'https' )) & (not word.startswith( '@' ))):
                 list.append(word)
         list = " ".join(list)
         array = np.append(array,list)
@@ -44,26 +42,17 @@ def remove_stop_words(inputText):
     return new_series
 
 def sequential_mixed_model( inputShape):
-    N = 180
+
     model = Sequential()
-    model.add(Embedding(N, 128, input_length=inputShape))
-    # model.add(Flatten())
+    model.add(Embedding(180, 128, input_length=inputShape))
     model.add(Conv1D(128, 5, activation='relu'))
-    # model.add(GlobalMaxPooling1D())
     model.add(MaxPooling1D(pool_size=4))
-    model.add(LSTM(128, dropout=0.4, recurrent_dropout=0.4))
-    model.add(Dense(50, activation='relu'))
-    model.add(Dense(25, activation='relu'))
-    model.add(Dense(10, activation='relu'))
+    model.add(LSTM(64, dropout=0.4, recurrent_dropout=0.4))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dropout(0.3))
+    model.add(Dense(16, activation='relu'))
+    model.add(Dropout(0.3))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer="Adam", metrics=['binary_accuracy'])
     return model
 
-def dense_model( inputShape):
-    model = Sequential()
-    model.add(Dense(500, activation='relu', input_shape=inputShape))
-    model.add(Dense(250, activation='relu'))
-    model.add(Dense(50, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer="Adam", metrics=['binary_accuracy'])
-    return model
